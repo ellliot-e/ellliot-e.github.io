@@ -8,7 +8,7 @@ export const ThemeContext = React.createContext({
 });
 
 
-const ThemeProvider = ({children}) => {
+const ThemeContextProvider = ({children}) => {
   const [background, setBackground] = useState("#FFFFFF");
   const [mono, setMono] = useState("#000000");
   const value = useMemo(
@@ -23,8 +23,4 @@ const ThemeProvider = ({children}) => {
   );
 };
 
-export default ({ element }) => (
-  <ThemeProvider>
-    {element}
-  </ThemeProvider>
-);
+export default ThemeContextProvider;

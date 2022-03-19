@@ -34,7 +34,6 @@
     "gatsby-plugin-styled-components": "^5.10.0",
     "gatsby-source-filesystem": "^4.10.0",
     "gatsby-transformer-sharp": "^4.10.0",
-    "grommet": "^2.20.1",
     "lodash": "^4.17.21",
     "points-on-curve": "^1.0.0",
     "prop-types": "^15.8.1",

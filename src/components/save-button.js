@@ -1,7 +1,7 @@
 import React from "react";
 import PropTypes from "prop-types";
 import { saveAs } from "file-saver";
-import { Button } from "grommet";
+import { Button } from "./elements";
 
 const SaveButton = React.forwardRef((props, ref) => {
   const handleDownload = () => {

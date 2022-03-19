@@ -1,7 +1,6 @@
 import React, { useEffect, useState, useRef, useContext } from "react";
 import styled from "styled-components";
-import { Heading, Button } from "grommet";
-import { Range } from "../components/slider";
+import { Button, Heading, Range } from "../components/elements";
 import { PadBox, Split, Stack } from "@bedrock-layout/primitives";
 import { random } from "lodash";
 import SaveButton from "../components/save-button";
@@ -83,7 +82,6 @@ const CustomRange = props => {
     </Heading>
     <Range {...rest} />
     </div>
-
   );
 }
 
