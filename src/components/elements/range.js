@@ -1,8 +1,11 @@
 import React from "react";
 import styled from "styled-components";
+import { Inline } from "@bedrock-layout/primitives";
+import { MinusCircle, PlusCircle } from "react-feather";
 
-const thumbHeight = 20;
-const trackHeight = "4px";
+
+const thumbHeight = 10;
+const trackHeight = "3px";
 
 const StyledRange = styled.input`
   -webkit-appearance: none;
@@ -25,17 +28,14 @@ const StyledRange = styled.input`
     -webkit-appearance: none;
     appearance: none;
     position: relative;
-    height: ${thumbHeight}px;
-    width: ${thumbHeight}px;
+    height: ${thumbHeight * 1.5}px;
+    width: ${thumbHeight * 1.5}px;
     background: var(--background);
-    outline: 4px solid var(--mono);
+    outline: var(--stroke) solid var(--mono);
     border-radius: 100%;
     border: 0;
     top: 50%;
     transform: translateY(-50%);
-    transition: background-color 150ms;
-    transition: outline 0.1s linear;
-
   }
 
   &::-moz-range-track {
@@ -50,7 +50,8 @@ const StyledRange = styled.input`
     margin: 0;
     height: ${thumbHeight};
     width: ${thumbHeight};
-    background:  var(--mono);
+    background:  var(--background);
+    outline: var(--stroke) solid var(--mono);
     border-radius: 100%;
     border: 0;
   }
@@ -71,9 +72,9 @@ const StyledRange = styled.input`
     height: ${thumbHeight};
     width: ${thumbHeight};
     background:  var(--mono);
+    outline: var(--stroke) solid var(--mono);
     border-radius: 100%;
     border: 0;
-    transition: background-color 150ms;
     top: 0;
     margin: 0;
     box-shadow: none;
@@ -81,28 +82,55 @@ const StyledRange = styled.input`
 
   &:hover {
     &::-webkit-slider-thumb {
-      outline: 6px solid var(--mono);
+      outline: var(--hover-stroke) solid var(--mono);
     }
     &::-moz-range-thumb {
-      outline: 6px solid var(--mono);
+      outline: var(--hover-stroke) solid var(--mono);
     }
     &::-ms-thumb {
-      outline: 6px solid var(--mono);
+      outline: var(--hover-stroke) solid var(--mono);
     }
   }
+`;
+
+const Control = styled.div`
+  cursor: pointer;
+  height: ${2 * thumbHeight}px;
+  line-height: ${2 * thumbHeight}px;
+  > svg {
+    stroke: var(--mono);
+    fill: var(--background);
+    stroke-width: var(--stroke);
+    overflow: visible;
+  }
+  &:hover {
+    > svg > circle {
+      stroke-width: var(--hover-stroke);
+    }
+  }
+
 `;
 
 
 export const Range = props => {
   const { value, min, max, step, onChange } = props;
   return (
-    <StyledRange
-      type="range"
-      step={step}
-      min={min}
-      max={max}
-      value={value}
-      onChange={e => onChange(+e.currentTarget.value)}
-    />
+    <Inline justify="center" align="center" gutter="lg">
+      <Control onClick={() => onChange(value - step)}>
+        <MinusCircle size={2 * thumbHeight} />
+      </Control>
+      <StyledRange
+        type="range"
+        step={step}
+        min={min}
+        max={max}
+        value={value}
+        onChange={e => onChange(+e.currentTarget.value)}
+      />
+      <Control onClick={() => onChange(value + step)}>
+        <PlusCircle size={2 * thumbHeight} />
+      </Control>
+    </Inline>
+
   );
 };

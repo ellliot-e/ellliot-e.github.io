@@ -1,89 +1,25 @@
-import React, { useEffect, useState, useRef, useContext } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import styled from "styled-components";
 import { Button, Heading, Range } from "../components/elements";
-import { PadBox, Split, Stack } from "@bedrock-layout/primitives";
+import Lissajous from "../components/art/lissajous";
 import { random } from "lodash";
 import SaveButton from "../components/save-button";
 import { ThemeContext } from "../context/theme-context";
-import * as d3Shape from "d3-shape";
-import { range, sortBy } from "lodash";
-import { getScale, getRange, linearizePath } from "../utils/helpers";
-
-const getLissajousData = (options = {}) => {
-  const { A = 2, B = 3, D = Math.PI, samples = 2 * Math.PI, step = 0.1} = options;
-  const data = range(0, samples, step).map((t) => ({
-    t,
-    x: Math.sin(A * t + D),
-    y: Math.sin(B * t)
-  }));
-  return sortBy(data, "t");
-};
-
-// lissajous lines svg
-const Lines = React.forwardRef((props, ref) => {
-  const {
-    xDim = 1200,
-    yDim = 900,
-    A,
-    B,
-    D,
-    samples = 50,
-    xOffset = 4,
-    yOffset = 3,
-    basePadding = 40
-  } = props;
-
-  const domain = {x: [-1, 1], y: [-1, 1]};
-  const xPadding = [basePadding, samples * xOffset + basePadding];
-  const yPadding = [basePadding, samples * yOffset + basePadding];
-  const svgRange = getRange(xDim, yDim, xPadding, yPadding);
-  const theme = useContext(ThemeContext);
-  const data = getLissajousData({ A, B, D });
-  const scale = getScale(domain, svgRange);
-
-  const pathFunction = d3Shape
-    .line()
-    .curve(d3Shape.curveBasisClosed)
-    .x((d) => scale.x(d.x))
-    .y((d) => scale.y(d.y));
-
-  const d = linearizePath(pathFunction(data));
-
-  return (
-    <div style={{ maxHeight: "100vh"}}>
-      <svg
-        xmlns="http://www.w3.org/2000/svg"
-        ref={ref}
-        viewBox={`0 0 ${xDim} ${yDim}`}
-        style={{ background: theme.background, maxHeight: "100vh" }}
-      >
-        {range(0, samples, 1).map((i) => {
-          return (
-            <path
-              key={i}
-              d={d}
-              transform={`translate(${(i - 1) * xOffset} ${(i - 1) * yOffset })`}
-              style={{ stroke: theme.mono, fill: "none" }}
-            />
-            );
-        })}
-      </svg>
-    </div>
-  );
-});
+import { InlineMath } from "react-katex";
+import { Shuffle, Play, Pause, Download } from "react-feather";
 
 
 const CustomRange = props => {
-  const { title, ...rest } = props;
+  const { title, value, ...rest } = props;
   return (
-    <div>
-    <Heading level="5" size="small" alignSelf="center" margin={{bottom: "none"}}>
-      {title}
-    </Heading>
-    <Range {...rest} />
-    </div>
+    <>
+      <Heading size="extraSmall" alignSelf="center" margin={{bottom: "none"}}>
+        <span>{title}{` = ${value.toFixed(2)}`}</span>
+      </Heading>
+      <Range value={value} {...rest} />
+    </>
   );
-}
+};
 
 const BackgroundButton = () => {
   const {setBackground} = React.useContext(ThemeContext);
@@ -99,7 +35,7 @@ const BackgroundButton = () => {
   }
 
   return (
-     <Button label="Background!" size="medium" onClick={changeColor}/>
+     <Button label="Background!" onClick={changeColor}/>
   )
 }
 
@@ -117,17 +53,46 @@ const MonoButton = () => {
   }
 
   return (
-     <Button label="Color!" size="medium" onClick={changeColor}/>
+     <Button label="Color!" onClick={changeColor}/>
   )
 }
 
-const SidebarBox = styled(PadBox)`
-  border-right: 4px solid var(--mono);
-  height: 100vh;
-  min-width: 20rem;
+const DashboardWrapper = styled.div`
+  display: grid;
+  grid-template-columns: minmax(275px, 1fr) 4fr;
+  grid-template-rows: calc(100vh - 100px);
+  grid-template-areas:
+    "sidebar content";
 `;
 
-const Lissajous= () => {
+const SidebarBox = styled.div`
+  grid-area: sidebar;
+  padding: 1rem;
+  border-right: var(--stroke) solid var(--mono);
+  display: flex;
+  flex-direction: column;
+  gap: 4rem;
+  overflow: auto;
+`;
+
+const ContentBox = styled.div`
+  grid-area: content;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  overflow: hidden;
+  > svg {
+    border: var(--stroke) solid var(--mono);
+    margin: 2rem;
+  }
+`;
+
+const ControlBox = styled.div`
+  margin-bottom: 2rem;
+`;
+
+
+const LissajousPage = () => {
 
   const svgRef = useRef();
 
@@ -143,12 +108,7 @@ const Lissajous= () => {
 
   const togglePlaying = () => {
     setPlaying(!playing);
-  }
-
-  const update = () => {
-    console.log("UPDATE", playing)
-
-  }
+  };
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -164,24 +124,26 @@ const Lissajous= () => {
     setA(random(1, 10, true));
     setB(random(1, 10, true));
     setD(random(0, Math.PI * 2, true));
-  }
+  };
 
   return (
-    <main style={{ height: "100vh" }}>
-      <Split
-        gutter="none" fraction="auto-start"
-      >
-        <SidebarBox padding="xl">
-          <Heading level="3" size="medium">Controls</Heading>
-          <Stack gutter="lg">
-            <Button label="Randomize!" size="medium" onClick={randomize}/>
-            <BackgroundButton />
-            <Button label={playing ? "Pause!" : "Play!"} size="medium" onClick={togglePlaying}/>
-            {/* <MonoButton /> */}
-          </Stack>
-
+    <DashboardWrapper>
+      <SidebarBox>
+          <Heading size="medium">Math</Heading>
+          <div>
+            <Heading size="extraSmall">
+              <InlineMath>
+                x=sin(\omega_xt +\delta_x)
+              </InlineMath>
+            </Heading>
+            <Heading size="extraSmall">
+              <InlineMath>
+                y=sin(\omega_yt)
+              </InlineMath>
+            </Heading>
+          </div>
           <CustomRange
-            title="A Value"
+            title={<InlineMath>\omega_x</InlineMath>}
             value={A}
             min={1}
             max={10}
@@ -189,7 +151,7 @@ const Lissajous= () => {
             onChange={setA}
           />
           <CustomRange
-            title="B Value"
+            title={<InlineMath>\omega_y</InlineMath>}
             value={B}
             min={1}
             max={10}
@@ -197,7 +159,7 @@ const Lissajous= () => {
             onChange={setB}
           />
           <CustomRange
-            title="D value"
+            title={<InlineMath>\delta_x</InlineMath>}
             value={D}
             min={0}
             max={Math.PI * 2}
@@ -228,16 +190,27 @@ const Lissajous= () => {
             step={0.1}
             onChange={setYOffset}
           />
-          <Stack style={{ marginTop: "20px" }}>
-            <SaveButton ref={svgRef} fileName={`lissajous-${Date.now()}`}/>
-          </Stack>
-        </SidebarBox>
-        <PadBox padding="xl" style={{ height: "100vh", overflow: "scroll"}}>
-          <Lines ref={svgRef} A={A} B={B} D={D} samples={samples} xOffset={xOffset} yOffset={yOffset} />
-        </PadBox>
-      </Split>
-    </main>
+      </SidebarBox>
+      <ContentBox>
+          <Lissajous
+            ref={svgRef}
+            A={A}
+            B={B}
+            D={D}
+            samples={samples}
+            xOffset={xOffset}
+            yOffset={yOffset}
+          />
+        <ControlBox>
+          <Button label="Randomize!" size="medium" onClick={randomize}/>
+          <BackgroundButton />
+          <Button label={playing ? "Pause!" : "Play!"} size="medium" onClick={togglePlaying}/>
+          <MonoButton />
+          <SaveButton ref={svgRef} fileName={`lissajous-${Date.now()}`}/>
+        </ControlBox>
+      </ContentBox>
+    </DashboardWrapper>
   );
 };
 
-export default Lissajous;
+export default LissajousPage;

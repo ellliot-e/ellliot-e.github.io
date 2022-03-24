@@ -1,27 +1,34 @@
 import * as React from "react";
 import PropTypes from "prop-types";
-import { createGlobalStyle } from "styled-components";
+import styled from "styled-components";
 
+const Wrapper = styled.div`
+  display: flex;
+  flex-direction: column;
+  min-height: 100%;
+`;
 
-const GlobalStyle = createGlobalStyle`
-  html {
-    --mono: #000000;
-    --background: #FFFFFF;
-  }
-  body {
-    margin: 0;
-  }
-`
+const Header = styled.header`
+  height: 50px;
+  border-bottom: 3px solid black;
+`;
+
+const Footer = styled.footer`
+  padding: 16px;
+  border-top: 3px solid black;
+  margin-top: auto;
+`;
 
 const Layout = ({ children }) => (
-  <React.Fragment>
-    <GlobalStyle />
-    {children}
-  </React.Fragment>
+  <Wrapper>
+    <Header>HEADER</Header>
+      {children}
+    <Footer>FOOTER</Footer>
+  </Wrapper>
 );
 
 Layout.propTypes = {
   children: PropTypes.node.isRequired,
 }
 
-export default Layout;
+export { Layout };

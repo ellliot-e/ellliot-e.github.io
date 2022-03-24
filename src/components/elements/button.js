@@ -1,6 +1,20 @@
 import React from "react";
 import PropTypes from "prop-types";
 import styled from "styled-components";
+import { Heading } from "./heading";
+
+const CustomButton = styled.button`
+  background: var(--background);
+  color: var(--mono);
+  border: var(--stroke) solid var(--mono);
+  padding: 0.25em 1em;
+  margin: 10px;
+  min-width: 120px;
+  &:hover {
+    outline: var(--add-stroke) solid var(--mono);
+  }
+`;
+
 
 
 const Button = ({
@@ -11,14 +25,14 @@ const Button = ({
   // * Allow styled-components "as" prop
   ...props
 }) => {
-  const text = children ? children : label;
+  const text = children ? children : <Heading size="extraSmall">{label}</Heading>;
   return (
-    <button
-      id={id}
-      {...props}
-    >
-      {text}
-    </button>
+      <CustomButton
+        id={id}
+        {...props}
+      >
+        {text}
+      </CustomButton>
   );
 };
 

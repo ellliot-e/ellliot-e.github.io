@@ -7,13 +7,22 @@ export const GlobalStyle = createGlobalStyle`
   *, *:before, *:after {
     box-sizing: border-box;
   }
-  html {
+
+  :root {
     --mono: #000000;
     --background: #FFFFFF;
-    box-sizing: border-box;
-    scroll-behavior: smooth;
+    --primaryFont: 'Roboto Mono';
+    --stroke: 3px;
+    --add-stroke: 1px;
+    --hover-stroke: calc(var(--stroke) + var(--add-stroke));
   }
+
+  html {
+    height: 100%;
+  }
+
   body {
     background-color: var(--background);
+    height: 100%;
   }
 `

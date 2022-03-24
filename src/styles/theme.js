@@ -1,30 +1,36 @@
+import { css } from "styled-components";
+
 export const theme = {
-  font: {
-    sans: "Cambay, sans-serif",
-    serif: "Arvo, sans",
-    monospace: '"Ubuntu Mono", monospace',
-  },
-  fontSize: {
-    xs: "0.75rem",
-    sm: "0.875rem",
-    base: "1rem",
-    lg: "1.125rem",
-    xl: "1.25rem",
-    "2xl": "1.5rem",
-    "3xl": "1.875rem",
-    "4xl": "2.25rem",
-    "5xl": "3rem",
-    "6xl": "4rem",
-  },
-  fontWeight: {
-    hairline: "100",
-    thin: "200",
-    light: "300",
-    normal: "400",
-    medium: "500",
-    semibold: "600",
-    bold: "700",
-    extrabold: "800",
-    black: "900",
+  typography: {
+    h1: css`
+      font-size: 40px;
+      line-height: 48px;
+      font-family: var(--primaryFont);
+      color: var(--mono);
+    `,
+    h2: css`
+      font-size: 32px;
+      line-height: 40px;
+      font-family: var(--primaryFont);
+      color: var(--mono);
+    `,
+    h3: css`
+      font-size: 25px;
+      line-height: 32px;
+      font-family: var(--primaryFont);
+      color: var(--mono);
+    `,
+    h4: css`
+      font-size: 20px;
+      line-height: 25px;
+      font-family: var(--primaryFont);
+      color: var(--mono);
+    `,
+    h5: css`
+      font-size: 16px;
+      line-height: 20px;
+      font-family: var(--primaryFont);
+      color: var(--mono);
+    `
   },
 };
