@@ -17,12 +17,10 @@ export const GlobalStyle = createGlobalStyle`
     --hover-stroke: calc(var(--stroke) + var(--add-stroke));
   }
 
-  html {
-    height: 100%;
-  }
-
+  html,
   body {
     background-color: var(--background);
     height: 100%;
+    margin: 0;
   }
 `

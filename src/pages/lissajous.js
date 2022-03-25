@@ -57,10 +57,15 @@ const MonoButton = () => {
   )
 }
 
+const PageWrapper = styled.div`
+  // set height to account for header
+  height: calc(100vh - 50px);
+`;
+
 const DashboardWrapper = styled.div`
   display: grid;
   grid-template-columns: minmax(275px, 1fr) 4fr;
-  grid-template-rows: calc(100vh - 100px);
+  height: 100%;
   grid-template-areas:
     "sidebar content";
 `;
@@ -71,7 +76,7 @@ const SidebarBox = styled.div`
   border-right: var(--stroke) solid var(--mono);
   display: flex;
   flex-direction: column;
-  gap: 4rem;
+  gap: 2rem;
   overflow: auto;
 `;
 
@@ -81,14 +86,14 @@ const ContentBox = styled.div`
   flex-direction: column;
   align-items: center;
   overflow: hidden;
+  padding: 2rem;
   > svg {
     border: var(--stroke) solid var(--mono);
-    margin: 2rem;
   }
 `;
 
 const ControlBox = styled.div`
-  margin-bottom: 2rem;
+  margin-top: 2rem;
 `;
 
 
@@ -127,6 +132,7 @@ const LissajousPage = () => {
   };
 
   return (
+    <PageWrapper>
     <DashboardWrapper>
       <SidebarBox>
           <Heading size="medium">Math</Heading>
@@ -210,6 +216,7 @@ const LissajousPage = () => {
         </ControlBox>
       </ContentBox>
     </DashboardWrapper>
+    </PageWrapper>
   );
 };
 
