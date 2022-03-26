@@ -8,7 +8,6 @@ import { ThemeContext } from "../context/theme-context";
 import { InlineMath } from "react-katex";
 import { Shuffle, Play, Pause, Download } from "react-feather";
 
-
 const CustomRange = props => {
   const { title, value, ...rest } = props;
   return (
@@ -39,61 +38,40 @@ const BackgroundButton = () => {
   )
 }
 
-const MonoButton = () => {
-  const {setMono} = React.useContext(ThemeContext);
-
-  const changeColor = () => {
-    const colors = ["cyan", "grey", "pink", "black"];
-    const newColor = colors[random(colors.length - 1)];
-    document.documentElement.style.setProperty(
-      '--mono',
-      newColor
-    );
-    setMono(newColor);
-  }
-
-  return (
-     <Button label="Color!" onClick={changeColor}/>
-  )
-}
-
-const PageWrapper = styled.div`
-  // set height to account for header
+const GridWrapper = styled.div`
+  display: grid;
+  grid-template-columns: minmax(275px, 1fr) 4fr;
+  grid-template-areas:
+    "sidebar main";
   height: calc(100vh - 50px);
 `;
 
-const DashboardWrapper = styled.div`
-  display: grid;
-  grid-template-columns: minmax(275px, 1fr) 4fr;
-  height: 100%;
-  grid-template-areas:
-    "sidebar content";
-`;
-
-const SidebarBox = styled.div`
+const SidebarWrapper = styled.div`
   grid-area: sidebar;
   padding: 1rem;
   border-right: var(--stroke) solid var(--mono);
   display: flex;
   flex-direction: column;
-  gap: 2rem;
+  gap: 1.5rem;
   overflow: auto;
 `;
 
-const ContentBox = styled.div`
-  grid-area: content;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  overflow: hidden;
-  padding: 2rem;
+const MainWrapper = styled.div`
+  grid-area: main;
+  overflow: auto;
+  text-align: center;
+`;
+
+const SvgWrapper = styled.div`
+  width: 100%;
   > svg {
+    width: clamp(60%, 900px, 80%);
     border: var(--stroke) solid var(--mono);
   }
 `;
 
-const ControlBox = styled.div`
-  margin-top: 2rem;
+const ButtonWrapper = styled.div`
+  padding: 2rem;
 `;
 
 
@@ -132,9 +110,8 @@ const LissajousPage = () => {
   };
 
   return (
-    <PageWrapper>
-    <DashboardWrapper>
-      <SidebarBox>
+    <GridWrapper>
+      <SidebarWrapper>
           <Heading size="medium">Math</Heading>
           <div>
             <Heading size="extraSmall">
@@ -196,8 +173,15 @@ const LissajousPage = () => {
             step={0.1}
             onChange={setYOffset}
           />
-      </SidebarBox>
-      <ContentBox>
+      </SidebarWrapper>
+      <MainWrapper>
+        <ButtonWrapper>
+          <Button label="Randomize!" size="medium" onClick={randomize}/>
+          <BackgroundButton />
+          <Button label={playing ? "Pause!" : "Play!"} size="medium" onClick={togglePlaying}/>
+          <SaveButton ref={svgRef} fileName={`lissajous-${Date.now()}`}/>
+        </ButtonWrapper>
+        <SvgWrapper>
           <Lissajous
             ref={svgRef}
             A={A}
@@ -207,16 +191,9 @@ const LissajousPage = () => {
             xOffset={xOffset}
             yOffset={yOffset}
           />
-        <ControlBox>
-          <Button label="Randomize!" size="medium" onClick={randomize}/>
-          <BackgroundButton />
-          <Button label={playing ? "Pause!" : "Play!"} size="medium" onClick={togglePlaying}/>
-          <MonoButton />
-          <SaveButton ref={svgRef} fileName={`lissajous-${Date.now()}`}/>
-        </ControlBox>
-      </ContentBox>
-    </DashboardWrapper>
-    </PageWrapper>
+        </SvgWrapper>
+      </MainWrapper>
+    </GridWrapper>
   );
 };
 

@@ -1,6 +1,5 @@
 import React from "react";
 import styled from "styled-components";
-import { Inline } from "@bedrock-layout/primitives";
 import { MinusCircle, PlusCircle } from "react-feather";
 
 
@@ -15,7 +14,6 @@ const StyledRange = styled.input`
   width: 100%;
   margin: 0;
   padding: 0;
-  max-width: 700px;
   cursor: pointer;
 
   &::-webkit-slider-runnable-track {
@@ -111,11 +109,18 @@ const Control = styled.div`
 
 `;
 
+const RangeWrapper = styled.div`
+  display: flex;
+  flex-direction: row;
+  gap: 8px;
+  align-items: center;
+`;
+
 
 export const Range = props => {
   const { value, min, max, step, onChange } = props;
   return (
-    <Inline justify="center" align="center" gutter="lg">
+    <RangeWrapper>
       <Control onClick={() => onChange(value - step)}>
         <MinusCircle size={2 * thumbHeight} />
       </Control>
@@ -130,7 +135,7 @@ export const Range = props => {
       <Control onClick={() => onChange(value + step)}>
         <PlusCircle size={2 * thumbHeight} />
       </Control>
-    </Inline>
+    </RangeWrapper>
 
   );
 };
