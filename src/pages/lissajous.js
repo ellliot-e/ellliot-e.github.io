@@ -6,13 +6,12 @@ import { random } from "lodash";
 import SaveButton from "../components/save-button";
 import { ThemeContext } from "../context/theme-context";
 import { InlineMath } from "react-katex";
-import { Shuffle, Play, Pause, Download } from "react-feather";
 
 const CustomRange = props => {
   const { title, value, ...rest } = props;
   return (
     <>
-      <Heading size="extraSmall" alignSelf="center" margin={{bottom: "none"}}>
+      <Heading size="extraSmall">
         <span>{title}{` = ${value.toFixed(2)}`}</span>
       </Heading>
       <Range value={value} {...rest} />
