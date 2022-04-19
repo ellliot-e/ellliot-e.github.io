@@ -9,7 +9,6 @@ const CustomButton = styled.button`
   border: var(--stroke) solid var(--mono);
   padding: 0.25em 1em;
   margin: 10px;
-  min-width: 120px;
   &:hover {
     outline: var(--add-stroke) solid var(--mono);
   }

@@ -10,7 +10,14 @@ const IndexPage = () => {
       <h1>
        Home
       </h1>
-      <Link to="/lissajous"> LISSAJOUS!</Link>
+      <ul>
+        <li>
+          <Link to="/lissajous"> LISSAJOUS!</Link>
+        </li>
+        <li>
+          <Link to="/background"> BACKGROUND!</Link>
+        </li>
+      </ul>
     </main>
   )
 }

@@ -1,11 +1,11 @@
-import React, { useEffect, useState, useRef } from "react";
+import React, { useEffect, useRef, useReducer } from "react";
 import styled from "styled-components";
 import { Button, Heading, Range } from "../components/elements";
-import Lissajous from "../components/art/lissajous";
-import { random } from "lodash";
+import { Lissajous, lissajousVariables } from "../components/art/lissajous";
+import { random, filter } from "lodash";
 import SaveButton from "../components/save-button";
-import { ThemeContext } from "../context/theme-context";
 import { InlineMath } from "react-katex";
+import { QUERIES } from "../constants";
 
 const CustomRange = props => {
   const { title, value, ...rest } = props;
@@ -19,30 +19,13 @@ const CustomRange = props => {
   );
 };
 
-const BackgroundButton = () => {
-  const {setBackground} = React.useContext(ThemeContext);
-
-  const changeColor = () => {
-    const colors = ["orange", "tomato", "gold", "deepSkyBlue", "YellowGreen", "hotPink", "lightSeaGreen", "orchid", "salmon", "yellow"];
-    const newColor = colors[random(colors.length - 1)];
-    document.documentElement.style.setProperty(
-      '--background',
-      newColor
-    );
-    setBackground(newColor);
-  }
-
-  return (
-     <Button label="Background!" onClick={changeColor}/>
-  )
-}
 
 const GridWrapper = styled.div`
   display: grid;
   grid-template-columns: minmax(275px, 1fr) 4fr;
   grid-template-areas:
     "sidebar main";
-  height: calc(100vh - 50px);
+  height: calc(100vh - var(--header-height));
 `;
 
 const SidebarWrapper = styled.div`
@@ -62,10 +45,15 @@ const MainWrapper = styled.div`
 `;
 
 const SvgWrapper = styled.div`
+  --svg-width: 700px;
   width: 100%;
   > svg {
-    width: clamp(60%, 900px, 80%);
+    width: clamp(60%, var(--svg-width), 80%);
     border: var(--stroke) solid var(--mono);
+  }
+
+  @media ${QUERIES.desktopAndUp} {
+    --svg-width: 900px;
   }
 `;
 
@@ -73,40 +61,57 @@ const ButtonWrapper = styled.div`
   padding: 2rem;
 `;
 
+const reducer = (state, action) => {
+  switch (action.type) {
+    case "set":
+      return { ...state, [action.target]: action.value };
+    case "togglePlaying":
+      return { ...state, playing: !state.playing };
+    case "randomize":
+      const randomValues = filter(lissajousVariables, "animate");
+      return randomValues.reduce((memo, val) => {
+        memo[val.name] = random(val.min, val.max, true);
+        return memo;
+      }, {...state});
+    case "tick":
+      const animatingValues = filter(lissajousVariables, "animate");
+      return animatingValues.reduce((memo, val) => {
+        let sign = state.signs[val.name] || 1;
+        if (state[val.name] + sign * val.step > val.max || state[val.name] + sign * val.step < val.min) {
+          sign = sign * -1;
+        }
+        memo[val.name] = state[val.name] + sign * val.step;
+        memo.signs[val.name] = sign;
+        return memo;
+      }, {...state});
+    default:
+      throw new Error();
+  }
+};
+
+const initialState = lissajousVariables.reduce(
+  (memo, val) => {
+    memo[val.name] = val.initial;
+    return memo;
+  }, {
+  playing: false,
+  signs: {}
+});
+
 
 const LissajousPage = () => {
-
   const svgRef = useRef();
-
-  const [A, setA] = useState(2);
-  const [B, setB] = useState(5);
-  const [D, setD] = useState(Math.PI);
-  const [samples, setSamples] = useState(50);
-  const [xOffset, setXOffset] = useState(4);
-  const [yOffset, setYOffset] = useState(3);
-  const [playing, setPlaying] = useState(false);
-  const [count, setCount] = useState(0);
-
-
-  const togglePlaying = () => {
-    setPlaying(!playing);
-  };
+  const [state, dispatch] = useReducer(reducer, initialState);
 
   useEffect(() => {
     const interval = setInterval(() => {
-      if (playing) {
-        setA(() => A + 0.01)
-        setCount(() => count + 1);
+      if (state.playing) {
+        dispatch({ type: "tick" });
       }
-    }, 16);
+    }, 32);
     return () => clearInterval(interval);
-  }, [playing, count, A]);
+  }, [state]);
 
-  const randomize = () => {
-    setA(random(1, 10, true));
-    setB(random(1, 10, true));
-    setD(random(0, Math.PI * 2, true));
-  };
 
   return (
     <GridWrapper>
@@ -124,71 +129,29 @@ const LissajousPage = () => {
               </InlineMath>
             </Heading>
           </div>
-          <CustomRange
-            title={<InlineMath>\omega_x</InlineMath>}
-            value={A}
-            min={1}
-            max={10}
-            step={0.01}
-            onChange={setA}
-          />
-          <CustomRange
-            title={<InlineMath>\omega_y</InlineMath>}
-            value={B}
-            min={1}
-            max={10}
-            step={0.01}
-            onChange={setB}
-          />
-          <CustomRange
-            title={<InlineMath>\delta_x</InlineMath>}
-            value={D}
-            min={0}
-            max={Math.PI * 2}
-            step={0.01}
-            onChange={setD}
-          />
-          <CustomRange
-            title="samples"
-            value={samples}
-            min={1}
-            max={100}
-            step={1}
-            onChange={setSamples}
-          />
-          <CustomRange
-            title="x offset"
-            value={xOffset}
-            min={0}
-            max={15}
-            step={0.1}
-            onChange={setXOffset}
-          />
-          <CustomRange
-            title="y offset"
-            value={yOffset}
-            min={0}
-            max={15}
-            step={0.1}
-            onChange={setYOffset}
-          />
+          {lissajousVariables.map(v => (
+            <CustomRange
+              key={v.name}
+              title={v.title}
+              value={state[v.name]}
+              min={v.min}
+              max={v.max}
+              step={v.step}
+              onChange={(value) => dispatch({ type: "set", target: v.name, value })}
+            />
+          ))}
       </SidebarWrapper>
       <MainWrapper>
         <ButtonWrapper>
-          <Button label="Randomize!" size="medium" onClick={randomize}/>
-          <BackgroundButton />
-          <Button label={playing ? "Pause!" : "Play!"} size="medium" onClick={togglePlaying}/>
+          <Button label="Randomize!" size="medium" onClick={() => dispatch({ type: "randomize" })}/>
+          <Button label={state.playing ? "Pause!" : "Play!"} size="medium" onClick={() => dispatch({ type: "togglePlaying" })}/>
           <SaveButton ref={svgRef} fileName={`lissajous-${Date.now()}`}/>
         </ButtonWrapper>
         <SvgWrapper>
           <Lissajous
             ref={svgRef}
-            A={A}
-            B={B}
-            D={D}
-            samples={samples}
-            xOffset={xOffset}
-            yOffset={yOffset}
+           {...state}
+            optimizePath={!state.playing}
           />
         </SvgWrapper>
       </MainWrapper>

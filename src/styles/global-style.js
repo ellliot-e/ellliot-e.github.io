@@ -15,6 +15,7 @@ export const GlobalStyle = createGlobalStyle`
     --stroke: 3px;
     --add-stroke: 1px;
     --hover-stroke: calc(var(--stroke) + var(--add-stroke));
+    --header-height: 55px;
   }
 
   html,
@@ -23,4 +24,10 @@ export const GlobalStyle = createGlobalStyle`
     height: 100%;
     margin: 0;
   }
+
+  a {
+    color: var(--mono);
+    font-weight: 300;
+  }
+
 `
